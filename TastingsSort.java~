@@ -125,13 +125,23 @@ public class TastingsSort
     String pointValue = " ";
     int firstDash = str.indexOf("-");
     int firstUnder = str.indexOf("_");
+    int secondDash = str.indexOf("-",firstDash+1);
+    int secondUnder = str.indexOf("_",firstUnder+1);
+    if(secondDash == -1)
+    {
+      secondDash = str.lastIndexOf('.');
+    }
+    if(secondUnder == -1)
+    {
+      secondUnder = str.lastIndexOf('.');
+    }
     if(firstDash == -1)
     {
-      pointValue = str.substring(firstUnder+1,str.indexOf("_",firstUnder+1));
+      pointValue = str.substring(firstUnder+1,secondUnder);
     }
     if(firstUnder == -1)
     {
-      pointValue = str.substring(firstDash+1,str.indexOf("-",firstDash+1));
+      pointValue = str.substring(firstDash+1,secondDash); //ret -1 if there is no second - or _
     }
     return pointValue;
   }
@@ -148,7 +158,7 @@ public class TastingsSort
     for (int i = s.length()-1; i>=0; i--) 
     {
         char c = s.charAt(i);
-        if (!Character.isLetter(c) && !Character.isDigit(c))
+        if (!Character.isLetter(c) && !Character.isDigit(c) && !(c == '.'))
             return i;
     }
     return -1; 
@@ -185,47 +195,85 @@ public class TastingsSort
     
     return compValue;
   }
-  
-  public static String determineMedalFolder(String str)
+  public static boolean isIntegerParseInt(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (NumberFormatException nfe) {}
+        return false;
+    }
+  public static String determineMedalFolder(String str) //use with determinePoints(str)
   {
     String ret = "Misc Folder";
+    int len = str.length();
+    boolean isNumber = isIntegerParseInt(str.substring(0,2));
+    if(isNumber)
+    {
     if(Integer.parseInt(str.substring(0,2)) < 85)
     {
       ret = "Bronze Logos";
     }
-    if(Integer.parseInt(str.substring(0,2)) < 90 && Integer.parseInt(str.substring(0,2)) > 84)
+    if(Integer.parseInt(str.substring(0,2)) < 90 && Integer.parseInt(str.substring(0,2)) > 84 )
     {
       ret = "Silver Logos";
     }
-    if(Integer.parseInt(str.substring(0,2)) < 96 && Integer.parseInt(str.substring(0,2)) > 89)
+    if(Integer.parseInt(str.substring(0,2)) < 96 && Integer.parseInt(str.substring(0,2)) > 89 )
     {
       ret = "Gold Logos";
     }
-    if(Integer.parseInt(str.substring(0,2)) > 95)
+    if(Integer.parseInt(str.substring(0,2)) > 95 )
     {
       ret = "Platinum Logos";
     }
+    }
+    if(!isNumber)
+    {
+      if(str.substring(0,len).equals("Bronze"))
+      {
+        ret = "Bronze Logos";
+      }
+      if(str.substring(0,len).equals("Silver"))
+      {
+        ret = "Silver Logos";
+      }
+      if(str.substring(0,len).equals("Gold"))
+      {
+        ret = "Gold Logos";
+      }
+      if(str.substring(0,len).equals("Platinum"))
+      {
+        ret = "Platinum Logos";
+      }
+    }
     return ret;
   }
-  public static String determineYear(String str)
+  public static String determineYear(String str) //doesnt account for not year endings
   {
     String ret = "Misc Folder";
     int lastV = lastAlphaNumeric(str);
-    if(Integer.valueOf(str.substring(lastV,str.length()-1)) == 2013)
+    boolean isNumber = isIntegerParseInt(str.substring(lastV+1,str.lastIndexOf('.')));
+    if(isNumber)
+    {
+    if(Integer.valueOf(str.substring(lastV+1,str.lastIndexOf('.'))) == 2013)
     {
       ret = "2013 Logos";
     }
-    if(Integer.valueOf(str.substring(lastV,str.length()-1)) == 2014)
+    if(Integer.valueOf(str.substring(lastV+1,str.lastIndexOf('.'))) == 2014)
     {
       ret = "2014 Logos";
     }
-    if(Integer.valueOf(str.substring(lastV,str.length()-1)) == 2015)
+    if(Integer.valueOf(str.substring(lastV+1,str.lastIndexOf('.'))) == 2015)
     {
-      ret = "2013 Logos";
+      ret = "2015 Logos";
     }
-    if(Integer.valueOf(str.substring(lastV,str.length()-1)) == 2016)
+    if(Integer.valueOf(str.substring(lastV+1,str.lastIndexOf('.'))) == 2016)
     {
-      ret = "2013 Logos";
+      ret = "2016 Logos";
+    }
+    }
+    if(!isNumber)
+    {
+      ret = "Misc Folder";
     }
     return ret;
   }
@@ -237,9 +285,104 @@ public class TastingsSort
     File[] allF = f.listFiles();
     for(File i : allF)
     {
-      //Somehow rearrange based on the strings given for each function
+      
+      //String competition = determineCompetition(name);
+      //String medal = determineMedalFolder(name);
+      
+      //Files.move(i.getAbsolutePath(),"C:/TestFolder/CustomerLogos/" + year);
+      if(!i.isDirectory())
+      {
+        String name = i.getName();
+        String year = determineYear(name); //currently all = 2013 logos
+        if(year.equals("Misc Folder"))
+        {
+          i.renameTo(new File("C:/TestFolder/CustomerLogos/Misc Folder/" + name));
+        }
+        if(!(year.equals("Misc Folder")))
+        {
+          i.renameTo(new File("C:/TestFolder/CustomerLogos/" + year + "/" + name));
+        }
+      }
     }
+    System.out.println("Top directory sorted!");
+  } //Works as of 175 mins
+  public static void sortYearFolders(String yearpath)
+  {
+    File f = new File(yearpath);
+    File[] allF = f.listFiles();
+    for(File i : allF)
+    {
+      if(!i.isDirectory())
+      {
+        String name = i.getName();
+        String medal = determineMedalFolder(determinePoints(name));
+        if(medal.equals("Misc Folder"))
+        {
+          i.renameTo(new File(yearpath + "/Misc Folder/" + name));
+        }
+        if(!(medal.equals("Misc Folder")))
+        {
+          i.renameTo(new File(yearpath + "/" + medal + "/" + name));
+        }
+      }
+    }
+    System.out.println("Sorted " + f.getName());
   }
+  public static void sortAllYears()
+  {
+    sortYearFolders("C:/TestFolder/CustomerLogos/2013 Logos");
+    sortYearFolders("C:/TestFolder/CustomerLogos/2014 Logos");
+    sortYearFolders("C:/TestFolder/CustomerLogos/2015 Logos");
+    sortYearFolders("C:/TestFolder/CustomerLogos/2016 Logos");
+    System.out.println("Should be sorted in years..");
+  }
+  public static void sortByMedal(String medalpath)
+  {
+    File f = new File(medalpath);
+    File[] allF = f.listFiles();
+    for(File i : allF)
+    {
+      if(!i.isDirectory())
+      {
+        String name = i.getName();
+        String comp = determineCompetition(name);
+        if(comp.equals("Misc Folder"))
+        {
+          i.renameTo(new File(medalpath + "/Misc Folder/" + name));
+        }
+        if(!(comp.equals("Misc Folder")))
+        {
+          i.renameTo(new File(medalpath + "/" + comp + "/" + name));
+        }
+      }
+    }
+    System.out.println("Sorted the " + f.getName());
+  }
+  public static void sortAllMedals()
+  {
+    sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Bronze Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Silver Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Gold Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Platinum Logos/");
+    System.out.println("2013 sorted.");
+    sortByMedal("C:/TestFolder/CustomerLogos/2014 Logos/Bronze Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2014 Logos/Silver Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2014 Logos/Gold Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2014 Logos/Platinum Logos/");
+    System.out.println("2014 sorted.");
+    sortByMedal("C:/TestFolder/CustomerLogos/2015 Logos/Bronze Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2015 Logos/Silver Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2015 Logos/Gold Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2015 Logos/Platinum Logos/");
+    System.out.println("2015 sorted.");
+    sortByMedal("C:/TestFolder/CustomerLogos/2016 Logos/Bronze Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2016 Logos/Silver Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2016 Logos/Gold Logos/");
+    sortByMedal("C:/TestFolder/CustomerLogos/2016 Logos/Platinum Logos/");
+    System.out.println("2016 sorted.");
+    System.out.println("Everything should be in order!");
+  }
+    
 
     
   public static void main(String [] args)
@@ -248,10 +391,10 @@ public class TastingsSort
     //topLevelFolderMaking("C:/TestFolder/CustomerLogos/"); //22 min
     initializeMedalFolders();
     initializeSubFolders();
-    //To-Do - Put unknown files into each misc folder
-    //Sort each file by its heading into respective folder
-    //took 1 hr
-    
+    sortTopLevel();
+    sortAllYears(); //Finished sort year at 193 mins
+    sortAllMedals();
+    //Total time - 1hr 57 min first day, 1hr 38 min second day
     System.out.println("everything is k");
   }
 }

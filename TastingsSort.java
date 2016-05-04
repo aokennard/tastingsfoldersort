@@ -1,44 +1,53 @@
 import java.util.*;
 import java.io.*;
-public class TastingsSort
+public class TastingsSort 
 {
-  //Use index of to find either "-" or "_"
-  public int currentYear = 2016;
+  
+  /*
+   * 
+   * 
+   * My god, this is terrible. I made this for a one time use in a few hours. However, I should probbbbbably go back and make it a general file organizer
+   * 5/4/2016
+   * 
+   */
+  
+  
+  public String basePath = "C:/TestFolder/CustomerLogos/";
   //Will need to change based on year
   
-  public static void topLevelFolderMaking(String path)
+  public static void topLevelFolderMaking(String path) //Made specifically for only years. When I make this better: adjust by making an input array of folders
   {
     //Should be .
-    ArrayList<Integer> years = new ArrayList<Integer>();
-    years.add(2013);
-    years.add(2014);
-    years.add(2015);
-    years.add(2016);
+    ArrayList<Integer> folderss = new ArrayList<Integer>();
+    folderss.add(2013);
+    folderss.add(2014);
+    folderss.add(2015);
+    folderss.add(2016);
     //Bad but too lazy to lookup alternative ^
     File f = new File(path);
     File[] allF = f.listFiles();
-    for(int j = 0;j<years.size();j++)
+    for(int j = 0;j<folderss.size();j++)
     {
        for(File i : allF)
           {
-               if(i.getName().equals(years.get(j)+ " Logos"))
+               if(i.getName().equals(folderss.get(j)+ " Logos")) //Adjust
                {
-                 years.remove(years.get(j));
+                 folderss.remove(folderss.get(j));
                }
           }
     }
-    System.out.println(years);
-    for(int r = 0;r<years.size();r++)
+    System.out.println(folderss);
+    for(int r = 0;r<folderss.size();r++)
     {
-      File dir = new File(path + "/" + years.get(r)+ " Logos");
+      File dir = new File(path + "/" + folderss.get(r)+ " Logos"); //Adjust
       boolean success = dir.mkdir();
       if(success)
       {
-        System.out.println("Couldn't find " + years.get(r) + " folder. Creating..");
+        System.out.println("Couldn't find " + folderss.get(r) + " folder. Creating.."); 
       }
       else
       {
-        System.out.println("Directory failed for " + years.get(r) );
+        System.out.println("Directory failed for " + folderss.get(r) );
       }
     }
                            
@@ -46,8 +55,8 @@ public class TastingsSort
   public static void folderCheck(String path, String folderName)
   {
     //Inputs of the form "./CustomerLogos/(year) Logos/" 
-    File f = new File(path); //Current directory
-    File [] allF = f.listFiles(); //All files in current dir
+    File f = new File(path); 
+    File [] allF = f.listFiles(); 
     boolean folderExists = false;
     for(int i = 0;i<allF.length;i++)
     {
@@ -72,23 +81,23 @@ public class TastingsSort
     }
     //Making foldername
   }
-  public static void makeFolders(String folderName, boolean inHomeDir)
+  public static void makeFolders(String folderName, boolean inHomeDir) //Currently done
   {
-    ArrayList<Integer> years = new ArrayList<Integer>();
-    years.add(2013);
-    years.add(2014);
-    years.add(2015);
-    years.add(2016);
+    ArrayList<Integer> folders = new ArrayList<Integer>();
+    folders.add(2013);
+    folders.add(2014);
+    folders.add(2015);
+    folders.add(2016);
     if(inHomeDir)
     {
-    folderCheck("C:/TestFolder/CustomerLogos/", "Misc Folder");
+    folderCheck(basePath, "Misc Folder");
     }
-    for(int i = 0;i<years.size();i++)
+    for(int i = 0;i<folders.size();i++)
     {    
-       folderCheck("C:/TestFolder/CustomerLogos/" + years.get(i) + " Logos", folderName);
+       folderCheck(basePath + folders.get(i) + " Logos", folderName);
     }
   }
-  public static void makeSubFolders(String folderName)
+  public static void makeSubFolders(String folderName) //Make adjustab;e
   {
     //Meant for BTI,WBC,etc
     int[] years = {2013,2014,2015,2016};
@@ -97,11 +106,11 @@ public class TastingsSort
     {
       for(int j = 0;j<subfolders.length;j++)
       {
-        folderCheck("C:/TestFolder/CustomerLogos/" + years[i] + " Logos/" + subfolders[j], folderName);
+        folderCheck(basePath + years[i] + " Logos/" + subfolders[j], folderName);
       }
     }
   }
-  public static void initializeMedalFolders()
+  public static void initializeMedalFolders() //Make adjustable
   {
     makeFolders("Misc Folder",true); //47 min
     makeFolders("Bronze Logos", false);
@@ -110,7 +119,7 @@ public class TastingsSort
     makeFolders("Platinum Logos", false);
     
   }
-  public static void initializeSubFolders()
+  public static void initializeSubFolders() //Make adjustable
   {
     makeSubFolders("BTI");
     makeSubFolders("IRS");
@@ -120,7 +129,7 @@ public class TastingsSort
     makeSubFolders("Custom");
     makeSubFolders("Misc Folder");
   }
-  public static String determinePoints(String str) // 5min
+  public static String determinePoints(String str) //Make more specific : for all non alphanumerics
   {
     String pointValue = " ";
     int firstDash = str.indexOf("-");
@@ -141,7 +150,7 @@ public class TastingsSort
     }
     if(firstUnder == -1)
     {
-      pointValue = str.substring(firstDash+1,secondDash); //ret -1 if there is no second - or _
+      pointValue = str.substring(firstDash+1,secondDash);
     }
     return pointValue;
   }
@@ -163,7 +172,7 @@ public class TastingsSort
     }
     return -1; 
    }
-  public static String determineCompetition(String str) //or : how .equals got its groove back - 20mins
+  public static String determineCompetition(String str) //Make adjustable
   {
     String compValue = "Misc Folder";
     int endCVal = firstAlphaNumeric(str);
@@ -195,14 +204,14 @@ public class TastingsSort
     
     return compValue;
   }
-  public static boolean isIntegerParseInt(String str) {
+  public static boolean isIntegerParseInt(String str) { //thanks stackoverflow
         try {
             Integer.parseInt(str);
             return true;
         } catch (NumberFormatException nfe) {}
         return false;
     }
-  public static String determineMedalFolder(String str) //use with determinePoints(str)
+  public static String determineMedalFolder(String str) //use with determinePoints(str) - make adjustable
   {
     String ret = "Misc Folder";
     int len = str.length();
@@ -247,7 +256,7 @@ public class TastingsSort
     }
     return ret;
   }
-  public static String determineYear(String str) //doesnt account for not year endings
+  public static String determineYear(String str) //doesnt account for not year endings - make adjustable
   {
     String ret = "Misc Folder";
     int lastV = lastAlphaNumeric(str);
@@ -278,35 +287,31 @@ public class TastingsSort
     return ret;
   }
     
-  public static void sortTopLevel() //1 hr 57 min spent
+  public static void sortTopLevel() //1 hr 57 min spent - make adjustable
   {
     //Takes customerlogos - it basically determines where to put stuff based on STR_#pts_YEAR - all else goes in Misc
-    File f = new File("C:/TestFolder/CustomerLogos/");
+    File f = new File(basePath);
     File[] allF = f.listFiles();
     for(File i : allF)
     {
       
-      //String competition = determineCompetition(name);
-      //String medal = determineMedalFolder(name);
-      
-      //Files.move(i.getAbsolutePath(),"C:/TestFolder/CustomerLogos/" + year);
       if(!i.isDirectory())
       {
         String name = i.getName();
-        String year = determineYear(name); //currently all = 2013 logos
-        if(year.equals("Misc Folder"))
+        String year = determineYear(name); //currently all = 2013 logos Adjust
+        if(year.equals("Misc Folder")) //Adjust
         {
-          i.renameTo(new File("C:/TestFolder/CustomerLogos/Misc Folder/" + name));
+          i.renameTo(new File(basePath + "/Misc Folder/" + name)); //Adjust
         }
-        if(!(year.equals("Misc Folder")))
+        if(!(year.equals("Misc Folder"))) //Adjust
         {
-          i.renameTo(new File("C:/TestFolder/CustomerLogos/" + year + "/" + name));
+          i.renameTo(new File(basePath + year + "/" + name)); //Adjust
         }
       }
     }
     System.out.println("Top directory sorted!");
   } //Works as of 175 mins
-  public static void sortYearFolders(String yearpath)
+  public static void sortYearFolders(String yearpath) //make adjustable
   {
     File f = new File(yearpath);
     File[] allF = f.listFiles();
@@ -316,11 +321,11 @@ public class TastingsSort
       {
         String name = i.getName();
         String medal = determineMedalFolder(determinePoints(name));
-        if(medal.equals("Misc Folder"))
+        if(medal.equals("Misc Folder")) //Adjust
         {
-          i.renameTo(new File(yearpath + "/Misc Folder/" + name));
+          i.renameTo(new File(yearpath + "/Misc Folder/" + name)); //Adjust
         }
-        if(!(medal.equals("Misc Folder")))
+        if(!(medal.equals("Misc Folder"))) //Adjust
         {
           i.renameTo(new File(yearpath + "/" + medal + "/" + name));
         }
@@ -328,7 +333,7 @@ public class TastingsSort
     }
     System.out.println("Sorted " + f.getName());
   }
-  public static void sortAllYears()
+  public static void sortAllYears() //Make adjustable
   {
     sortYearFolders("C:/TestFolder/CustomerLogos/2013 Logos");
     sortYearFolders("C:/TestFolder/CustomerLogos/2014 Logos");
@@ -336,7 +341,7 @@ public class TastingsSort
     sortYearFolders("C:/TestFolder/CustomerLogos/2016 Logos");
     System.out.println("Should be sorted in years..");
   }
-  public static void sortByMedal(String medalpath)
+  public static void sortByMedal(String medalpath) //Make adjustable
   {
     File f = new File(medalpath);
     File[] allF = f.listFiles();
@@ -346,7 +351,7 @@ public class TastingsSort
       {
         String name = i.getName();
         String comp = determineCompetition(name);
-        if(comp.equals("Misc Folder"))
+        if(comp.equals("Misc Folder")) 
         {
           i.renameTo(new File(medalpath + "/Misc Folder/" + name));
         }
@@ -358,7 +363,7 @@ public class TastingsSort
     }
     System.out.println("Sorted the " + f.getName());
   }
-  public static void sortAllMedals()
+  public static void sortAllMedals() //holy cow make adjustable
   {
     sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Bronze Logos/");
     sortByMedal("C:/TestFolder/CustomerLogos/2013 Logos/Silver Logos/");
@@ -388,7 +393,7 @@ public class TastingsSort
   public static void main(String [] args)
   {
     //Make sure to only run first once. Works then. - second thought - make a doesExist(String folder) to check stuff
-    //topLevelFolderMaking("C:/TestFolder/CustomerLogos/"); //22 min
+    //topLevelFolderMaking(basePath); //22 min
     initializeMedalFolders();
     initializeSubFolders();
     sortTopLevel();
